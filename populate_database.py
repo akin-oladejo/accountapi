@@ -52,11 +52,14 @@ start_date = date.today() - timedelta(days=n_days)
 transactions = [] # store the transactions between calculated date and current date
 
 for i in range(n_transactions):
+    sender_index = random.randint(0, n_users-1) # choose random sender
+    available_indices = [i for i in range(n_users-1) if i != sender_index] # choices for recipient must not include sender
+    recipient_index = random.choice(available_indices) # choose random recipient
     transactions.append({
         '_id':faker.md5(), # create an id for this transaction
         'transaction_date':datetime.strftime(faker.date_between(start_date), '%Y-%m-%d'),
-        'sender_id':id_list[random.randint(0, n_users-1)],
-        'recipient_id':id_list[random.randint(0, n_users-1)], # fix this to exclude sender
+        'sender_id':id_list[sender_index],
+        'recipient_id':id_list[recipient_index], # fix this to exclude sender
         'amount':random.randint(50,500000), 
         'current_balance':random.randint(100,999999),
         'narration':faker.sentence(), 
@@ -73,7 +76,6 @@ db = client['Accountapi'] # use 'Accountapi' database
 
 users_col = db['users'] # create collection 'users'
 users_col.insert_many(users) # dump users dictionary into db as collection
-print(users_col.inserted_ids)
 
 trans_col = db['transfers'] #create collection 'transactions'
 trans_col.insert_many(transactions) # dump transactions dictionary into db as collection
